@@ -3,6 +3,7 @@ package com.renzomendoza.employee_service.service;
 import com.renzomendoza.employee_service.dto.*;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
 import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.exception.EmployeeNotFoundException;
 import com.renzomendoza.employee_service.mapper.EmployeeMapper;
 import com.renzomendoza.employee_service.model.EmployeeProfile;
@@ -47,7 +48,7 @@ class EmployeeServiceTest {
         when(employeeRepository.save(any(EmployeeProfile.class))).thenReturn(employeeProfile);
 
         // Act
-        EmployeeProfile result = employeeService.createEmployee(request);
+        EmployeeResponse result = employeeService.createEmployee(request);
 
         // Assert
         assertNotNull(result);
@@ -63,7 +64,7 @@ class EmployeeServiceTest {
         when(employeeRepository.findById(TEST_UUID)).thenReturn(Optional.of(employeeProfile));
 
         // Act
-        EmployeeProfile result = employeeService.getEmployeeById(TEST_UUID);
+        EmployeeResponse result = employeeService.getEmployeeById(TEST_UUID);
 
         // Assert
         assertNotNull(result);
@@ -107,7 +108,7 @@ class EmployeeServiceTest {
         when(employeeRepository.save(any(EmployeeProfile.class))).thenReturn(existingEmployee);
 
         // Act
-        EmployeeProfile result = employeeService.updateEmployee(TEST_UUID, request);
+        EmployeeResponse result = employeeService.updateEmployee(TEST_UUID, request);
 
         // Assert
         assertNotNull(result);

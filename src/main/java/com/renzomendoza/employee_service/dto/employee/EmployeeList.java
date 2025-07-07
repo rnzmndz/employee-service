@@ -3,6 +3,8 @@ package com.renzomendoza.employee_service.dto.employee;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -10,6 +12,9 @@ import lombok.*;
 @Builder
 @Schema(description = "Employee summary information")
 public class EmployeeList {
+
+    @Schema(description = "Employee's id")
+    private UUID id;
 
     @Schema(description = "Employee's first name", example = "John")
     private String firstName;

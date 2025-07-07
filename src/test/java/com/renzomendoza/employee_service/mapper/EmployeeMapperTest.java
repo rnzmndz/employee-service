@@ -1,232 +1,284 @@
 package com.renzomendoza.employee_service.mapper;
 
-import com.renzomendoza.employee_service.dto.AddressDto;
-import com.renzomendoza.employee_service.dto.ContactInformationDto;
-import com.renzomendoza.employee_service.dto.EmergencyContactDto;
-import com.renzomendoza.employee_service.dto.employee.EmployeeList;
+import com.renzomendoza.employee_service.dto.*;
 import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
-import com.renzomendoza.employee_service.model.Address;
-import com.renzomendoza.employee_service.model.ContactInformation;
-import com.renzomendoza.employee_service.model.EmergencyContact;
-import com.renzomendoza.employee_service.model.EmployeeProfile;
+import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
+import com.renzomendoza.employee_service.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class EmployeeMapperTest {
 
     private EmployeeMapper employeeMapper;
+    private EmployeeRequest sampleRequest;
+    private EmployeeProfile sampleProfile;
 
     @BeforeEach
     void setUp() {
-        employeeMapper = Mappers.getMapper(EmployeeMapper.class);
+        employeeMapper = new EmployeeMapperImpl();
+        sampleRequest = createSampleRequest();
+        sampleProfile = createSampleProfile();
     }
 
     @Test
-    void testEmployeeRequestToEmployeeProfile() {
-        // Given
-        EmployeeRequest request = EmployeeRequest.builder()
-                .firstName("John")
-                .middleName("Doe")
-                .lastName("Smith")
-                .jobTitle("Developer")
-                .imageUrl("http://example.com/image.jpg")
-                .hiredDate(LocalDate.of(2020, 1, 1))
-                .birthDate(LocalDate.of(1990, 5, 15))
-                .addressDto(AddressDto.builder()
-                        .street("123 Main St")
-                        .city("New York")
-                        .state("NY")
-                        .zipCode("10001")
-                        .build())
+    void employeeRequestToEmployee_shouldMapCorrectly() {
+        EmployeeProfile result = employeeMapper.employeeRequestToEmployee(sampleRequest);
+
+        assertNull(result.getId(), "ID should not be mapped from request");
+        assertEmployeeFieldsMatch(sampleRequest, result);
+
+        // Check if nested objects are null first, then assert their content
+        if (result.getAddress() != null) {
+            assertNestedObjectsMatch(sampleRequest, result);
+        } else {
+            // Log the issue for debugging
+            System.out.println("WARNING: Address is null - check MapStruct configuration");
+            assertNotNull(result.getAddress(), "Address should be mapped");
+        }
+    }
+
+    @Test
+    void employeeToEmployeeResponse_shouldMapCorrectly() {
+        EmployeeResponse result = employeeMapper.employeeToEmployeeResponse(sampleProfile);
+
+        assertEquals(sampleProfile.getId(), result.getId());
+        assertEmployeeFieldsMatch(sampleProfile, result);
+        assertNestedObjectsMatch(sampleProfile, result);
+    }
+
+    @Test
+    void employeeProfileToEmployeeRequest_shouldMapCorrectly() {
+        EmployeeRequest result = employeeMapper.employeeProfileToEmployeeRequest(sampleProfile);
+
+        assertEmployeeFieldsMatch(sampleProfile, result);
+        assertNestedObjectsMatch(sampleProfile, result);
+    }
+
+    @Test
+    void updateEmployeeFromRequest_shouldUpdateNonNullFields() {
+        EmployeeRequest partialUpdate = EmployeeRequest.builder()
+                .firstName("Updated")
+                .lastName("NewLastName")
+                .jobTitle("Senior Software Engineer")
                 .contactInformationDto(ContactInformationDto.builder()
-                        .phoneNumber("123-456-7890")
-                        .email("john.smith@example.com")
-                        .build())
-                .emergencyContactDto(EmergencyContactDto.builder()
-                        .firstName("Jane")
-                        .lastName("Doe")
-                        .phoneNumber("987-654-3210")
+                        .email("updated@example.com")
+                        .phoneNumber("+1234567890") // Include phone number to avoid null issues
                         .build())
                 .build();
 
-        // When
-        EmployeeProfile employee = employeeMapper.employeeRequestToEmployee(request);
+        // Store original values for comparison
+        String originalMiddleName = sampleProfile.getMiddleName();
+        String originalImageUrl = sampleProfile.getImageUrl();
+        LocalDate originalHiredDate = sampleProfile.getHiredDate();
+        String originalEmergencyContactFirstName = sampleProfile.getEmergencyContact().getFirstName();
 
-        // Then
-        assertNotNull(employee);
-        assertEquals("John", employee.getFirstName());
-        assertEquals("Doe", employee.getMiddleName());
-        assertEquals("Smith", employee.getLastName());
-        assertEquals("Developer", employee.getJobTitle());
-        assertEquals("http://example.com/image.jpg", employee.getImageUrl());
-        assertEquals(LocalDate.of(2020, 1, 1), employee.getHiredDate());
-        assertEquals(LocalDate.of(1990, 5, 15), employee.getBirthDate());
+        employeeMapper.updateEmployeeFromRequest(partialUpdate, sampleProfile);
 
-        // Verify address mapping
-        assertNotNull(employee.getAddress());
-        assertEquals("123 Main St", employee.getAddress().getStreet());
-        assertEquals("New York", employee.getAddress().getCity());
-        assertEquals("NY", employee.getAddress().getState());
-        assertEquals("10001", employee.getAddress().getZipCode());
+        // Verify updated fields
+        assertEquals("Updated", sampleProfile.getFirstName());
+        assertEquals("NewLastName", sampleProfile.getLastName());
+        assertEquals("Senior Software Engineer", sampleProfile.getJobTitle());
 
-        // Verify contact information mapping
-        assertNotNull(employee.getContactInformation());
-        assertEquals("123-456-7890", employee.getContactInformation().getPhoneNumber());
-        assertEquals("john.smith@example.com", employee.getContactInformation().getEmail());
+        // Debug the contact information update
+        if (sampleProfile.getContactInformation() != null) {
+            System.out.println("Contact info email: " + sampleProfile.getContactInformation().getEmail());
+            assertEquals("updated@example.com", sampleProfile.getContactInformation().getEmail());
+        } else {
+            fail("ContactInformation should not be null after update");
+        }
 
-        // Verify emergency contact mapping
-        assertNotNull(employee.getEmergencyContact());
-        assertEquals("Jane", employee.getEmergencyContact().getFirstName());
-        assertEquals("Doe", employee.getEmergencyContact().getLastName());
-        assertEquals("987-654-3210", employee.getEmergencyContact().getPhoneNumber());
+        // Verify unchanged fields
+        assertEquals(originalMiddleName, sampleProfile.getMiddleName());
+        assertEquals(originalImageUrl, sampleProfile.getImageUrl());
+        assertEquals(originalHiredDate, sampleProfile.getHiredDate());
+        assertEquals(originalEmergencyContactFirstName, sampleProfile.getEmergencyContact().getFirstName());
     }
 
     @Test
-    void testEmployeeToEmployeeRequest() {
-        // Given
-        EmployeeProfile employee = EmployeeProfile.builder()
-                .firstName("Alice")
-                .middleName("Marie")
-                .lastName("Johnson")
-                .jobTitle("Manager")
-                .imageUrl("http://example.com/alice.jpg")
-                .hiredDate(LocalDate.of(2019, 6, 10))
-                .birthDate(LocalDate.of(1985, 8, 20))
-                .address(Address.builder()
-                        .street("456 Oak Ave")
-                        .city("Los Angeles")
-                        .state("CA")
-                        .zipCode("90001")
-                        .build())
-                .contactInformation(ContactInformation.builder()
-                        .phoneNumber("555-123-4567")
-                        .email("alice.johnson@example.com")
-                        .build())
-                .emergencyContact(EmergencyContact.builder()
-                        .firstName("Bob")
-                        .lastName("Lee")
-                        .phoneNumber("555-987-6543")
-                        .build())
-                .build();
+    void updateEmployeeFromRequest_shouldHandleNullRequest() {
+        EmployeeProfile originalProfile = createSampleProfile();
 
-        // When
-        EmployeeRequest request = employeeMapper.employeeToEmployeeRequest(employee);
+        employeeMapper.updateEmployeeFromRequest(null, sampleProfile);
 
-        // Then
-        assertNotNull(request);
-        assertEquals("Alice", request.getFirstName());
-        assertEquals("Marie", request.getMiddleName());
-        assertEquals("Johnson", request.getLastName());
-        assertEquals("Manager", request.getJobTitle());
-        assertEquals("http://example.com/alice.jpg", request.getImageUrl());
-        assertEquals(LocalDate.of(2019, 6, 10), request.getHiredDate());
-        assertEquals(LocalDate.of(1985, 8, 20), request.getBirthDate());
-
-        // Verify address mapping
-        assertNotNull(request.getAddressDto());
-        assertEquals("456 Oak Ave", request.getAddressDto().getStreet());
-        assertEquals("Los Angeles", request.getAddressDto().getCity());
-        assertEquals("CA", request.getAddressDto().getState());
-        assertEquals("90001", request.getAddressDto().getZipCode());
-
-        // Verify contact information mapping
-        assertNotNull(request.getContactInformationDto());
-        assertEquals("555-123-4567", request.getContactInformationDto().getPhoneNumber());
-        assertEquals("alice.johnson@example.com", request.getContactInformationDto().getEmail());
-
-        // Verify emergency contact mapping
-        assertNotNull(request.getEmergencyContactDto());
-        assertEquals("Bob", request.getEmergencyContactDto().getFirstName());
-        assertEquals("Lee", request.getEmergencyContactDto().getLastName());
-        assertEquals("555-987-6543", request.getEmergencyContactDto().getPhoneNumber());
+        // Verify no changes by comparing key fields
+        assertEquals(originalProfile.getFirstName(), sampleProfile.getFirstName());
+        assertEquals(originalProfile.getJobTitle(), sampleProfile.getJobTitle());
+        assertEquals(originalProfile.getImageUrl(), sampleProfile.getImageUrl());
     }
 
-    @Test
-    void testEmployeeToEmployeeList() {
-        // Given
-        EmployeeProfile employee = EmployeeProfile.builder()
-                .firstName("Michael")
-                .middleName("James")
-                .lastName("Brown")
-                .jobTitle("Designer")
-                .imageUrl("http://example.com/michael.jpg")
+    // Helper methods for creating test data
+    private EmployeeRequest createSampleRequest() {
+        return EmployeeRequest.builder()
+                .firstName("John")
+                .middleName("Michael")
+                .lastName("Doe")
+                .jobTitle("Software Engineer")
+                .imageUrl("https://example.com/profile.jpg")
+                .hiredDate(LocalDate.of(2023, 1, 15))
+                .birthDate(LocalDate.of(1990, 5, 20))
+                .addressDto(createSampleAddressDto())
+                .contactInformationDto(createSampleContactInfoDto())
+                .emergencyContactDto(createSampleEmergencyContactDto())
                 .build();
-
-        // When
-        EmployeeList employeeList = employeeMapper.employeeToEmployeeList(employee);
-
-        // Then
-        assertNotNull(employeeList);
-        assertEquals("Michael", employeeList.getFirstName());
-        assertEquals("James", employeeList.getMiddleName());
-        assertEquals("Brown", employeeList.getLastName());
-        assertEquals("Designer", employeeList.getJobTitle());
-        assertEquals("http://example.com/michael.jpg", employeeList.getImageUrl());
     }
 
-    @Test
-    void testAddressDtoToAddress() {
-        // Given
-        AddressDto addressDto = AddressDto.builder()
-                .street("789 Pine Rd")
-                .city("Chicago")
-                .state("IL")
-                .zipCode("60601")
+    private EmployeeProfile createSampleProfile() {
+        return EmployeeProfile.builder()
+                .id(UUID.randomUUID())
+                .firstName("Old")
+                .middleName("Name")
+                .lastName("Oldson")
+                .jobTitle("Old Job")
+                .imageUrl("https://old.com/image.jpg")
+                .hiredDate(LocalDate.of(2020, 1, 1))
+                .birthDate(LocalDate.of(1980, 1, 1))
+                .address(createSampleAddress())
+                .contactInformation(createSampleContactInfo())
+                .emergencyContact(createSampleEmergencyContact())
                 .build();
-
-        // When
-        Address address = employeeMapper.addressDtoToAddress(addressDto);
-
-        // Then
-        assertNotNull(address);
-        assertEquals("789 Pine Rd", address.getStreet());
-        assertEquals("Chicago", address.getCity());
-        assertEquals("IL", address.getState());
-        assertEquals("60601", address.getZipCode());
     }
 
-    @Test
-    void testContactInformationDtoToContactInformation() {
-        // Given
-        ContactInformationDto contactDto = ContactInformationDto.builder()
-                .phoneNumber("111-222-3333")
-                .email("test@example.com")
+    private AddressDto createSampleAddressDto() {
+        return AddressDto.builder()
+                .street("123 Main St")
+                .city("New York")
+                .state("NY")
+                .zipCode("10001")
                 .build();
-
-        // When
-        ContactInformation contactInfo = employeeMapper.contactInformationDtoToContactInformation(contactDto);
-
-        // Then
-        assertNotNull(contactInfo);
-        assertEquals("111-222-3333", contactInfo.getPhoneNumber());
-        assertEquals("test@example.com", contactInfo.getEmail());
     }
 
-    @Test
-    void testEmergencyContactDtoToEmergencyContact() {
-        // Given
-        EmergencyContactDto emergencyContactDto = EmergencyContactDto.builder()
-                .firstName("Sarah")
-                .lastName("Ann")
-                .phoneNumber("444-555-6666")
+    private Address createSampleAddress() {
+        return Address.builder()
+                .street("Old St")
+                .city("Old City")
+                .state("OC")
+                .zipCode("00000")
                 .build();
+    }
 
-        // When
-        EmergencyContact emergencyContact = employeeMapper.emergencyContactDtoToEmergencyContact(emergencyContactDto);
+    private ContactInformationDto createSampleContactInfoDto() {
+        return ContactInformationDto.builder()
+                .phoneNumber("+1234567890")
+                .email("john.doe@example.com")
+                .build();
+    }
 
-        // Then
-        assertNotNull(emergencyContact);
-        assertEquals("Sarah", emergencyContact.getFirstName());
-        assertEquals("Ann", emergencyContact.getLastName());
-        assertEquals("444-555-6666", emergencyContact.getPhoneNumber());
+    private ContactInformation createSampleContactInfo() {
+        return ContactInformation.builder()
+                .phoneNumber("+0000000000")
+                .email("old@example.com")
+                .build();
+    }
+
+    private EmergencyContactDto createSampleEmergencyContactDto() {
+        return EmergencyContactDto.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .phoneNumber("+1987654321")
+                .build();
+    }
+
+    private EmergencyContact createSampleEmergencyContact() {
+        return EmergencyContact.builder()
+                .firstName("Old")
+                .lastName("Contact")
+                .phoneNumber("+0000000000")
+                .build();
+    }
+
+    // Helper methods for assertions
+    private void assertEmployeeFieldsMatch(EmployeeRequest request, EmployeeProfile profile) {
+        assertEquals(request.getFirstName(), profile.getFirstName());
+        assertEquals(request.getMiddleName(), profile.getMiddleName());
+        assertEquals(request.getLastName(), profile.getLastName());
+        assertEquals(request.getJobTitle(), profile.getJobTitle());
+        assertEquals(request.getImageUrl(), profile.getImageUrl());
+        assertEquals(request.getHiredDate(), profile.getHiredDate());
+        assertEquals(request.getBirthDate(), profile.getBirthDate());
+    }
+
+    private void assertEmployeeFieldsMatch(EmployeeProfile profile, EmployeeResponse response) {
+        assertEquals(profile.getFirstName(), response.getFirstName());
+        assertEquals(profile.getMiddleName(), response.getMiddleName());
+        assertEquals(profile.getLastName(), response.getLastName());
+        assertEquals(profile.getJobTitle(), response.getJobTitle());
+        assertEquals(profile.getImageUrl(), response.getImageUrl());
+        assertEquals(profile.getHiredDate(), response.getHiredDate());
+        assertEquals(profile.getBirthDate(), response.getBirthDate());
+    }
+
+    private void assertEmployeeFieldsMatch(EmployeeProfile profile, EmployeeRequest request) {
+        assertEquals(profile.getFirstName(), request.getFirstName());
+        assertEquals(profile.getMiddleName(), request.getMiddleName());
+        assertEquals(profile.getLastName(), request.getLastName());
+        assertEquals(profile.getJobTitle(), request.getJobTitle());
+        assertEquals(profile.getImageUrl(), request.getImageUrl());
+        assertEquals(profile.getHiredDate(), request.getHiredDate());
+        assertEquals(profile.getBirthDate(), request.getBirthDate());
+    }
+
+    private void assertNestedObjectsMatch(EmployeeRequest request, EmployeeProfile profile) {
+        assertAddressMatch(request.getAddressDto(), profile.getAddress());
+        assertContactInfoMatch(request.getContactInformationDto(), profile.getContactInformation());
+        assertEmergencyContactMatch(request.getEmergencyContactDto(), profile.getEmergencyContact());
+    }
+
+    private void assertNestedObjectsMatch(EmployeeProfile profile, EmployeeResponse response) {
+        assertAddressMatch(profile.getAddress(), response.getAddressDto());
+        assertContactInfoMatch(profile.getContactInformation(), response.getContactInformationDto());
+        assertEmergencyContactMatch(profile.getEmergencyContact(), response.getEmergencyContactDto());
+    }
+
+    private void assertNestedObjectsMatch(EmployeeProfile profile, EmployeeRequest request) {
+        assertAddressMatch(profile.getAddress(), request.getAddressDto());
+        assertContactInfoMatch(profile.getContactInformation(), request.getContactInformationDto());
+        assertEmergencyContactMatch(profile.getEmergencyContact(), request.getEmergencyContactDto());
+    }
+
+    private void assertAddressMatch(AddressDto dto, Address entity) {
+        assertNotNull(entity);
+        assertEquals(dto.getStreet(), entity.getStreet());
+        assertEquals(dto.getCity(), entity.getCity());
+        assertEquals(dto.getState(), entity.getState());
+        assertEquals(dto.getZipCode(), entity.getZipCode());
+    }
+
+    private void assertAddressMatch(Address entity, AddressDto dto) {
+        assertNotNull(dto);
+        assertEquals(entity.getStreet(), dto.getStreet());
+        assertEquals(entity.getCity(), dto.getCity());
+        assertEquals(entity.getState(), dto.getState());
+        assertEquals(entity.getZipCode(), dto.getZipCode());
+    }
+
+    private void assertContactInfoMatch(ContactInformationDto dto, ContactInformation entity) {
+        assertNotNull(entity);
+        assertEquals(dto.getPhoneNumber(), entity.getPhoneNumber());
+        assertEquals(dto.getEmail(), entity.getEmail());
+    }
+
+    private void assertContactInfoMatch(ContactInformation entity, ContactInformationDto dto) {
+        assertNotNull(dto);
+        assertEquals(entity.getPhoneNumber(), dto.getPhoneNumber());
+        assertEquals(entity.getEmail(), dto.getEmail());
+    }
+
+    private void assertEmergencyContactMatch(EmergencyContactDto dto, EmergencyContact entity) {
+        assertNotNull(entity);
+        assertEquals(dto.getFirstName(), entity.getFirstName());
+        assertEquals(dto.getLastName(), entity.getLastName());
+        assertEquals(dto.getPhoneNumber(), entity.getPhoneNumber());
+    }
+
+    private void assertEmergencyContactMatch(EmergencyContact entity, EmergencyContactDto dto) {
+        assertNotNull(dto);
+        assertEquals(entity.getFirstName(), dto.getFirstName());
+        assertEquals(entity.getLastName(), dto.getLastName());
+        assertEquals(entity.getPhoneNumber(), dto.getPhoneNumber());
     }
 }

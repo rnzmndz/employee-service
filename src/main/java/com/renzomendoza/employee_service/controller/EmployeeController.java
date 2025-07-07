@@ -3,6 +3,7 @@ package com.renzomendoza.employee_service.controller;
 import com.renzomendoza.employee_service.dto.*;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
 import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.model.EmployeeProfile;
 import com.renzomendoza.employee_service.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,26 +35,26 @@ public class EmployeeController {
     @Operation(summary = "Create a new employee", description = "Creates a new employee with the provided details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Employee created successfully",
-                    content = @Content(schema = @Schema(implementation = EmployeeProfile.class))),
+                    content = @Content(schema = @Schema(implementation = EmployeeResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input provided")
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeProfile> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeProfile createdEmployee = employeeService.createEmployee(employeeRequest);
+    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
+        EmployeeResponse createdEmployee = employeeService.createEmployee(employeeRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
     }
 
     @Operation(summary = "Get employee by ID", description = "Returns a single employee by their unique ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Employee found",
-                    content = @Content(schema = @Schema(implementation = EmployeeProfile.class))),
+                    content = @Content(schema = @Schema(implementation = EmployeeResponse.class))),
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @GetMapping(value = "/{employeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeProfile> getEmployeeById(
+    public ResponseEntity<EmployeeResponse> getEmployeeById(
             @Parameter(description = "ID of the employee to be retrieved", required = true)
             @PathVariable UUID employeeId) {
-        EmployeeProfile employee = employeeService.getEmployeeById(employeeId);
+        EmployeeResponse employee = employeeService.getEmployeeById(employeeId);
         return ResponseEntity.ok(employee);
     }
 
@@ -94,17 +95,17 @@ public class EmployeeController {
     @Operation(summary = "Update employee", description = "Updates an existing employee's information")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Employee updated successfully",
-                    content = @Content(schema = @Schema(implementation = EmployeeProfile.class))),
+                    content = @Content(schema = @Schema(implementation = EmployeeResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input provided"),
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @PutMapping(value = "/{employeeId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeProfile> updateEmployee(
+    public ResponseEntity<EmployeeResponse> updateEmployee(
             @Parameter(description = "ID of the employee to be updated", required = true)
             @PathVariable UUID employeeId,
 
             @Valid @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeProfile updatedEmployee = employeeService.updateEmployee(employeeId, employeeRequest);
+        EmployeeResponse updatedEmployee = employeeService.updateEmployee(employeeId, employeeRequest);
         return ResponseEntity.ok(updatedEmployee);
     }
 
