@@ -5,7 +5,7 @@ import com.renzomendoza.employee_service.dto.ContactInformationDto;
 import com.renzomendoza.employee_service.dto.EmergencyContactDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeRequestDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.model.Address;
 import com.renzomendoza.employee_service.model.ContactInformation;
@@ -27,7 +27,7 @@ public interface EmployeeMapper {
     @Mapping(target = "address", source = "addressDto")
     @Mapping(target = "contactInformation", source = "contactInformationDto")
     @Mapping(target = "emergencyContact", source = "emergencyContactDto")
-    EmployeeProfile employeeUpdateToEmployee(EmployeeUpdateDto employeeUpdateDto);
+    EmployeeProfile employeeUpdateToEmployee(EmployeeRequestDto employeeRequestDto);
 
     /**
      * Maps EmployeeCreate to EmployeeProfile entity
@@ -51,7 +51,7 @@ public interface EmployeeMapper {
     @Mapping(target = "addressDto", source = "address")
     @Mapping(target = "contactInformationDto", source = "contactInformation")
     @Mapping(target = "emergencyContactDto", source = "emergencyContact")
-    EmployeeUpdateDto employeeProfileToEmployeeRequest(EmployeeProfile employee);
+    EmployeeRequestDto employeeProfileToEmployeeRequest(EmployeeProfile employee);
 
     /**
      * Maps EmployeeProfile to EmployeeList DTO (for summary views)
@@ -65,7 +65,7 @@ public interface EmployeeMapper {
     @Mapping(target = "address", source = "addressDto")
     @Mapping(target = "contactInformation", source = "contactInformationDto")
     @Mapping(target = "emergencyContact", source = "emergencyContactDto")
-    void updateEmployeeFromRequest(EmployeeUpdateDto employeeUpdateDto, @MappingTarget EmployeeProfile employeeProfile);
+    void updateEmployeeFromRequest(EmployeeRequestDto employeeRequestDto, @MappingTarget EmployeeProfile employeeProfile);
 
     // Rest of your existing methods remain the same...
     Address addressDtoToAddress(AddressDto addressDto);

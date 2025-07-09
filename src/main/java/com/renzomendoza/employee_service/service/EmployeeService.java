@@ -5,7 +5,7 @@ import com.renzomendoza.employee_service.dto.ContactInformationDto;
 import com.renzomendoza.employee_service.dto.EmergencyContactDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeRequestDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.exception.EmployeeNotFoundException;
 import com.renzomendoza.employee_service.mapper.EmployeeMapper;
@@ -31,7 +31,6 @@ public class EmployeeService {
 
     public EmployeeResponse createEmployee(EmployeeCreateDto employeeCreateDto) {
         EmployeeProfile employee = employeeMapper.employeeCreateToEmployee(employeeCreateDto);
-        employee.setId(UUID.randomUUID());
         employeeRepository.save(employee);
         return employeeMapper.employeeToEmployeeResponse(employee);
     }
@@ -50,11 +49,11 @@ public class EmployeeService {
                 .map(employeeMapper::employeeToEmployeeList);
     }
 
-    public EmployeeResponse updateEmployee(UUID employeeId, EmployeeUpdateDto employeeUpdateDto) {
+    public EmployeeResponse updateEmployee(UUID employeeId, EmployeeRequestDto employeeRequestDto) {
         EmployeeProfile existingEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
-        employeeMapper.updateEmployeeFromRequest(employeeUpdateDto, existingEmployee);
+        employeeMapper.updateEmployeeFromRequest(employeeRequestDto, existingEmployee);
 
         employeeRepository.save(existingEmployee);
         return employeeMapper.employeeToEmployeeResponse(existingEmployee);

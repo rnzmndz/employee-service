@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "Request object for updating an employee")
-public class EmployeeUpdateDto {
+@Schema(description = "Request object for updating and creating an employee")
+public class EmployeeRequestDto {
 
     @NotBlank(message = "First name is required")
     @Size(max = 50, message = "First name must be less than 50 characters")

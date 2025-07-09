@@ -3,7 +3,7 @@ package com.renzomendoza.employee_service.controller;
 import com.renzomendoza.employee_service.dto.*;
 import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeRequestDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +39,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "400", description = "Invalid input provided")
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeCreateDto employeeUpdateDto) {
-        EmployeeResponse createdEmployee = employeeService.createEmployee(employeeUpdateDto);
+    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeCreateDto employeeCreateDto) {
+        EmployeeResponse createdEmployee = employeeService.createEmployee(employeeCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
     }
 
@@ -104,8 +104,8 @@ public class EmployeeController {
             @Parameter(description = "ID of the employee to be updated", required = true)
             @PathVariable UUID employeeId,
 
-            @Valid @RequestBody EmployeeUpdateDto employeeUpdateDto) {
-        EmployeeResponse updatedEmployee = employeeService.updateEmployee(employeeId, employeeUpdateDto);
+            @Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
+        EmployeeResponse updatedEmployee = employeeService.updateEmployee(employeeId, employeeRequestDto);
         return ResponseEntity.ok(updatedEmployee);
     }
 

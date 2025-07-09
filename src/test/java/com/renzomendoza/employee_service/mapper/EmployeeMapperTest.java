@@ -1,7 +1,7 @@
 package com.renzomendoza.employee_service.mapper;
 
 import com.renzomendoza.employee_service.dto.*;
-import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeRequestDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmployeeMapperTest {
 
     private EmployeeMapper employeeMapper;
-    private EmployeeUpdateDto sampleRequest;
+    private EmployeeRequestDto sampleRequest;
     private EmployeeProfile sampleProfile;
 
     @BeforeEach
@@ -53,7 +53,7 @@ class EmployeeMapperTest {
 
     @Test
     void employeeProfileToEmployeeRequest_shouldMapCorrectly() {
-        EmployeeUpdateDto result = employeeMapper.employeeProfileToEmployeeRequest(sampleProfile);
+        EmployeeRequestDto result = employeeMapper.employeeProfileToEmployeeRequest(sampleProfile);
 
         assertEmployeeFieldsMatch(sampleProfile, result);
         assertNestedObjectsMatch(sampleProfile, result);
@@ -61,7 +61,7 @@ class EmployeeMapperTest {
 
     @Test
     void updateEmployeeFromRequest_shouldUpdateNonNullFields() {
-        EmployeeUpdateDto partialUpdate = EmployeeUpdateDto.builder()
+        EmployeeRequestDto partialUpdate = EmployeeRequestDto.builder()
                 .firstName("Updated")
                 .lastName("NewLastName")
                 .jobTitle("Senior Software Engineer")
@@ -112,8 +112,8 @@ class EmployeeMapperTest {
     }
 
     // Helper methods for creating test data
-    private EmployeeUpdateDto createSampleRequest() {
-        return EmployeeUpdateDto.builder()
+    private EmployeeRequestDto createSampleRequest() {
+        return EmployeeRequestDto.builder()
                 .firstName("John")
                 .middleName("Michael")
                 .lastName("Doe")
@@ -192,7 +192,7 @@ class EmployeeMapperTest {
     }
 
     // Helper methods for assertions
-    private void assertEmployeeFieldsMatch(EmployeeUpdateDto request, EmployeeProfile profile) {
+    private void assertEmployeeFieldsMatch(EmployeeRequestDto request, EmployeeProfile profile) {
         assertEquals(request.getFirstName(), profile.getFirstName());
         assertEquals(request.getMiddleName(), profile.getMiddleName());
         assertEquals(request.getLastName(), profile.getLastName());
@@ -212,7 +212,7 @@ class EmployeeMapperTest {
         assertEquals(profile.getBirthDate(), response.getBirthDate());
     }
 
-    private void assertEmployeeFieldsMatch(EmployeeProfile profile, EmployeeUpdateDto request) {
+    private void assertEmployeeFieldsMatch(EmployeeProfile profile, EmployeeRequestDto request) {
         assertEquals(profile.getFirstName(), request.getFirstName());
         assertEquals(profile.getMiddleName(), request.getMiddleName());
         assertEquals(profile.getLastName(), request.getLastName());
@@ -222,7 +222,7 @@ class EmployeeMapperTest {
         assertEquals(profile.getBirthDate(), request.getBirthDate());
     }
 
-    private void assertNestedObjectsMatch(EmployeeUpdateDto request, EmployeeProfile profile) {
+    private void assertNestedObjectsMatch(EmployeeRequestDto request, EmployeeProfile profile) {
         assertAddressMatch(request.getAddressDto(), profile.getAddress());
         assertContactInfoMatch(request.getContactInformationDto(), profile.getContactInformation());
         assertEmergencyContactMatch(request.getEmergencyContactDto(), profile.getEmergencyContact());
@@ -234,7 +234,7 @@ class EmployeeMapperTest {
         assertEmergencyContactMatch(profile.getEmergencyContact(), response.getEmergencyContactDto());
     }
 
-    private void assertNestedObjectsMatch(EmployeeProfile profile, EmployeeUpdateDto request) {
+    private void assertNestedObjectsMatch(EmployeeProfile profile, EmployeeRequestDto request) {
         assertAddressMatch(profile.getAddress(), request.getAddressDto());
         assertContactInfoMatch(profile.getContactInformation(), request.getContactInformationDto());
         assertEmergencyContactMatch(profile.getEmergencyContact(), request.getEmergencyContactDto());

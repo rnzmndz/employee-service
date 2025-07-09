@@ -3,7 +3,7 @@ package com.renzomendoza.employee_service.service;
 import com.renzomendoza.employee_service.dto.*;
 import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeRequestDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.exception.EmployeeNotFoundException;
 import com.renzomendoza.employee_service.mapper.EmployeeMapper;
@@ -103,7 +103,7 @@ class EmployeeServiceTest {
     @Test
     void updateEmployee_ShouldUpdateExistingEmployee() {
         // Arrange
-        EmployeeUpdateDto request = createTestEmployeeRequest();
+        EmployeeRequestDto request = createTestEmployeeRequest();
         EmployeeProfile existingEmployee = createTestEmployeeProfile();
         when(employeeRepository.findById(TEST_UUID)).thenReturn(Optional.of(existingEmployee));
         when(employeeRepository.save(any(EmployeeProfile.class))).thenReturn(existingEmployee);
@@ -181,8 +181,8 @@ class EmployeeServiceTest {
     }
 
     // Helper methods
-    private EmployeeUpdateDto createTestEmployeeRequest() {
-        return EmployeeUpdateDto.builder()
+    private EmployeeRequestDto createTestEmployeeRequest() {
+        return EmployeeRequestDto.builder()
                 .firstName("Updated")
                 .middleName("Middle")
                 .lastName("Last")
