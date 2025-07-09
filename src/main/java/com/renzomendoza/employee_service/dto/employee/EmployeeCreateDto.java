@@ -15,8 +15,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "Request object for creating or updating an employee")
-public class EmployeeRequest {
+@Schema(description = "Request object for creating an employee")
+public class EmployeeCreateDto {
+
+    @Schema(description = "Employee's I.D.")
+    private UUID id;
 
     @NotBlank(message = "First name is required")
     @Size(max = 50, message = "First name must be less than 50 characters")

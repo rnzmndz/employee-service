@@ -3,8 +3,9 @@ package com.renzomendoza.employee_service.mapper;
 import com.renzomendoza.employee_service.dto.AddressDto;
 import com.renzomendoza.employee_service.dto.ContactInformationDto;
 import com.renzomendoza.employee_service.dto.EmergencyContactDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.model.Address;
 import com.renzomendoza.employee_service.model.ContactInformation;
@@ -20,13 +21,21 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface EmployeeMapper {
 
     /**
-     * Maps EmployeeRequest to EmployeeProfile entity
+     * Maps EmployeeUpdate to EmployeeProfile entity
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "address", source = "addressDto")
     @Mapping(target = "contactInformation", source = "contactInformationDto")
     @Mapping(target = "emergencyContact", source = "emergencyContactDto")
-    EmployeeProfile employeeRequestToEmployee(EmployeeRequest employeeRequest);
+    EmployeeProfile employeeUpdateToEmployee(EmployeeUpdateDto employeeUpdateDto);
+
+    /**
+     * Maps EmployeeCreate to EmployeeProfile entity
+     */
+    @Mapping(target = "address", source = "addressDto")
+    @Mapping(target = "contactInformation", source = "contactInformationDto")
+    @Mapping(target = "emergencyContact", source = "emergencyContactDto")
+    EmployeeProfile employeeCreateToEmployee(EmployeeCreateDto employeeUpdateDto);
 
     /**
      * Maps EmployeeProfile to EmployeeResponse DTO
@@ -42,7 +51,7 @@ public interface EmployeeMapper {
     @Mapping(target = "addressDto", source = "address")
     @Mapping(target = "contactInformationDto", source = "contactInformation")
     @Mapping(target = "emergencyContactDto", source = "emergencyContact")
-    EmployeeRequest employeeProfileToEmployeeRequest(EmployeeProfile employee);
+    EmployeeUpdateDto employeeProfileToEmployeeRequest(EmployeeProfile employee);
 
     /**
      * Maps EmployeeProfile to EmployeeList DTO (for summary views)
@@ -56,7 +65,7 @@ public interface EmployeeMapper {
     @Mapping(target = "address", source = "addressDto")
     @Mapping(target = "contactInformation", source = "contactInformationDto")
     @Mapping(target = "emergencyContact", source = "emergencyContactDto")
-    void updateEmployeeFromRequest(EmployeeRequest employeeRequest, @MappingTarget EmployeeProfile employeeProfile);
+    void updateEmployeeFromRequest(EmployeeUpdateDto employeeUpdateDto, @MappingTarget EmployeeProfile employeeProfile);
 
     // Rest of your existing methods remain the same...
     Address addressDtoToAddress(AddressDto addressDto);

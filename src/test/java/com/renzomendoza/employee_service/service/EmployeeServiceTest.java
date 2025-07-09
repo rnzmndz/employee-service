@@ -1,8 +1,9 @@
 package com.renzomendoza.employee_service.service;
 
 import com.renzomendoza.employee_service.dto.*;
+import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.exception.EmployeeNotFoundException;
 import com.renzomendoza.employee_service.mapper.EmployeeMapper;
@@ -42,9 +43,9 @@ class EmployeeServiceTest {
     @Test
     void createEmployee_ShouldReturnSavedEmployee() {
         // Arrange
-        EmployeeRequest request = createTestEmployeeRequest();
+        EmployeeCreateDto request = createTestEmployeeCreate();
         EmployeeProfile employeeProfile = createTestEmployeeProfile();
-        when(employeeMapper.employeeRequestToEmployee(any(EmployeeRequest.class))).thenReturn(employeeProfile);
+        when(employeeMapper.employeeCreateToEmployee(any(EmployeeCreateDto.class))).thenReturn(employeeProfile);
         when(employeeRepository.save(any(EmployeeProfile.class))).thenReturn(employeeProfile);
 
         // Act
@@ -53,7 +54,7 @@ class EmployeeServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(TEST_UUID, result.getId());
-        verify(employeeMapper).employeeRequestToEmployee(request);
+        verify(employeeMapper).employeeCreateToEmployee(request);
         verify(employeeRepository).save(employeeProfile);
     }
 
@@ -102,7 +103,7 @@ class EmployeeServiceTest {
     @Test
     void updateEmployee_ShouldUpdateExistingEmployee() {
         // Arrange
-        EmployeeRequest request = createTestEmployeeRequest();
+        EmployeeUpdateDto request = createTestEmployeeRequest();
         EmployeeProfile existingEmployee = createTestEmployeeProfile();
         when(employeeRepository.findById(TEST_UUID)).thenReturn(Optional.of(existingEmployee));
         when(employeeRepository.save(any(EmployeeProfile.class))).thenReturn(existingEmployee);
@@ -180,8 +181,25 @@ class EmployeeServiceTest {
     }
 
     // Helper methods
-    private EmployeeRequest createTestEmployeeRequest() {
-        return EmployeeRequest.builder()
+    private EmployeeUpdateDto createTestEmployeeRequest() {
+        return EmployeeUpdateDto.builder()
+                .firstName("Updated")
+                .middleName("Middle")
+                .lastName("Last")
+                .jobTitle("Developer")
+                .imageUrl("http://example.com/image.jpg")
+                .hiredDate(TEST_DATE)
+                .birthDate(TEST_DATE)
+                .addressDto(new AddressDto())
+                .contactInformationDto(new ContactInformationDto())
+                .emergencyContactDto(new EmergencyContactDto())
+                .build();
+    }
+
+    // Helper methods
+    private EmployeeCreateDto createTestEmployeeCreate() {
+        return EmployeeCreateDto.builder()
+                .id(TEST_UUID)
                 .firstName("Updated")
                 .middleName("Middle")
                 .lastName("Last")

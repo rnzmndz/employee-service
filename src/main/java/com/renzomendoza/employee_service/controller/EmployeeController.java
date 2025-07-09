@@ -1,10 +1,10 @@
 package com.renzomendoza.employee_service.controller;
 
 import com.renzomendoza.employee_service.dto.*;
+import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
-import com.renzomendoza.employee_service.model.EmployeeProfile;
 import com.renzomendoza.employee_service.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,8 +39,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "400", description = "Invalid input provided")
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeResponse createdEmployee = employeeService.createEmployee(employeeRequest);
+    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeCreateDto employeeUpdateDto) {
+        EmployeeResponse createdEmployee = employeeService.createEmployee(employeeUpdateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
     }
 
@@ -104,8 +104,8 @@ public class EmployeeController {
             @Parameter(description = "ID of the employee to be updated", required = true)
             @PathVariable UUID employeeId,
 
-            @Valid @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeResponse updatedEmployee = employeeService.updateEmployee(employeeId, employeeRequest);
+            @Valid @RequestBody EmployeeUpdateDto employeeUpdateDto) {
+        EmployeeResponse updatedEmployee = employeeService.updateEmployee(employeeId, employeeUpdateDto);
         return ResponseEntity.ok(updatedEmployee);
     }
 

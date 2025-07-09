@@ -3,8 +3,9 @@ package com.renzomendoza.employee_service.service;
 import com.renzomendoza.employee_service.dto.AddressDto;
 import com.renzomendoza.employee_service.dto.ContactInformationDto;
 import com.renzomendoza.employee_service.dto.EmergencyContactDto;
+import com.renzomendoza.employee_service.dto.employee.EmployeeCreateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeList;
-import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.exception.EmployeeNotFoundException;
 import com.renzomendoza.employee_service.mapper.EmployeeMapper;
@@ -28,8 +29,8 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
 
-    public EmployeeResponse createEmployee(EmployeeRequest employeeRequest) {
-        EmployeeProfile employee = employeeMapper.employeeRequestToEmployee(employeeRequest);
+    public EmployeeResponse createEmployee(EmployeeCreateDto employeeCreateDto) {
+        EmployeeProfile employee = employeeMapper.employeeCreateToEmployee(employeeCreateDto);
         employee.setId(UUID.randomUUID());
         employeeRepository.save(employee);
         return employeeMapper.employeeToEmployeeResponse(employee);
@@ -49,11 +50,11 @@ public class EmployeeService {
                 .map(employeeMapper::employeeToEmployeeList);
     }
 
-    public EmployeeResponse updateEmployee(UUID employeeId, EmployeeRequest employeeRequest) {
+    public EmployeeResponse updateEmployee(UUID employeeId, EmployeeUpdateDto employeeUpdateDto) {
         EmployeeProfile existingEmployee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
-        employeeMapper.updateEmployeeFromRequest(employeeRequest, existingEmployee);
+        employeeMapper.updateEmployeeFromRequest(employeeUpdateDto, existingEmployee);
 
         employeeRepository.save(existingEmployee);
         return employeeMapper.employeeToEmployeeResponse(existingEmployee);

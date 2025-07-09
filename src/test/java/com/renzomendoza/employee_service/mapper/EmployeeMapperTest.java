@@ -1,7 +1,7 @@
 package com.renzomendoza.employee_service.mapper;
 
 import com.renzomendoza.employee_service.dto.*;
-import com.renzomendoza.employee_service.dto.employee.EmployeeRequest;
+import com.renzomendoza.employee_service.dto.employee.EmployeeUpdateDto;
 import com.renzomendoza.employee_service.dto.employee.EmployeeResponse;
 import com.renzomendoza.employee_service.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmployeeMapperTest {
 
     private EmployeeMapper employeeMapper;
-    private EmployeeRequest sampleRequest;
+    private EmployeeUpdateDto sampleRequest;
     private EmployeeProfile sampleProfile;
 
     @BeforeEach
@@ -26,8 +26,8 @@ class EmployeeMapperTest {
     }
 
     @Test
-    void employeeRequestToEmployee_shouldMapCorrectly() {
-        EmployeeProfile result = employeeMapper.employeeRequestToEmployee(sampleRequest);
+    void employeeUpdateToEmployee_shouldMapCorrectly() {
+        EmployeeProfile result = employeeMapper.employeeUpdateToEmployee(sampleRequest);
 
         assertNull(result.getId(), "ID should not be mapped from request");
         assertEmployeeFieldsMatch(sampleRequest, result);
@@ -53,7 +53,7 @@ class EmployeeMapperTest {
 
     @Test
     void employeeProfileToEmployeeRequest_shouldMapCorrectly() {
-        EmployeeRequest result = employeeMapper.employeeProfileToEmployeeRequest(sampleProfile);
+        EmployeeUpdateDto result = employeeMapper.employeeProfileToEmployeeRequest(sampleProfile);
 
         assertEmployeeFieldsMatch(sampleProfile, result);
         assertNestedObjectsMatch(sampleProfile, result);
@@ -61,7 +61,7 @@ class EmployeeMapperTest {
 
     @Test
     void updateEmployeeFromRequest_shouldUpdateNonNullFields() {
-        EmployeeRequest partialUpdate = EmployeeRequest.builder()
+        EmployeeUpdateDto partialUpdate = EmployeeUpdateDto.builder()
                 .firstName("Updated")
                 .lastName("NewLastName")
                 .jobTitle("Senior Software Engineer")
@@ -112,8 +112,8 @@ class EmployeeMapperTest {
     }
 
     // Helper methods for creating test data
-    private EmployeeRequest createSampleRequest() {
-        return EmployeeRequest.builder()
+    private EmployeeUpdateDto createSampleRequest() {
+        return EmployeeUpdateDto.builder()
                 .firstName("John")
                 .middleName("Michael")
                 .lastName("Doe")
@@ -192,7 +192,7 @@ class EmployeeMapperTest {
     }
 
     // Helper methods for assertions
-    private void assertEmployeeFieldsMatch(EmployeeRequest request, EmployeeProfile profile) {
+    private void assertEmployeeFieldsMatch(EmployeeUpdateDto request, EmployeeProfile profile) {
         assertEquals(request.getFirstName(), profile.getFirstName());
         assertEquals(request.getMiddleName(), profile.getMiddleName());
         assertEquals(request.getLastName(), profile.getLastName());
@@ -212,7 +212,7 @@ class EmployeeMapperTest {
         assertEquals(profile.getBirthDate(), response.getBirthDate());
     }
 
-    private void assertEmployeeFieldsMatch(EmployeeProfile profile, EmployeeRequest request) {
+    private void assertEmployeeFieldsMatch(EmployeeProfile profile, EmployeeUpdateDto request) {
         assertEquals(profile.getFirstName(), request.getFirstName());
         assertEquals(profile.getMiddleName(), request.getMiddleName());
         assertEquals(profile.getLastName(), request.getLastName());
@@ -222,7 +222,7 @@ class EmployeeMapperTest {
         assertEquals(profile.getBirthDate(), request.getBirthDate());
     }
 
-    private void assertNestedObjectsMatch(EmployeeRequest request, EmployeeProfile profile) {
+    private void assertNestedObjectsMatch(EmployeeUpdateDto request, EmployeeProfile profile) {
         assertAddressMatch(request.getAddressDto(), profile.getAddress());
         assertContactInfoMatch(request.getContactInformationDto(), profile.getContactInformation());
         assertEmergencyContactMatch(request.getEmergencyContactDto(), profile.getEmergencyContact());
@@ -234,7 +234,7 @@ class EmployeeMapperTest {
         assertEmergencyContactMatch(profile.getEmergencyContact(), response.getEmergencyContactDto());
     }
 
-    private void assertNestedObjectsMatch(EmployeeProfile profile, EmployeeRequest request) {
+    private void assertNestedObjectsMatch(EmployeeProfile profile, EmployeeUpdateDto request) {
         assertAddressMatch(profile.getAddress(), request.getAddressDto());
         assertContactInfoMatch(profile.getContactInformation(), request.getContactInformationDto());
         assertEmergencyContactMatch(profile.getEmergencyContact(), request.getEmergencyContactDto());
