@@ -23,15 +23,4 @@ public class DevSecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    public WebFilter fakeAuthenticationFilter() {
-//        return (exchange, chain) -> {
-//            var fakeAuth = new UsernamePasswordAuthenticationToken(
-//                    "devUser", null,
-//                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
-//            );
-//            return chain.filter(exchange)
-//                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(fakeAuth));
-//        };
-//    }
 }
