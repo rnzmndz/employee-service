@@ -33,7 +33,7 @@ public class SecurityConfig {
             // Permit open endpoints
             auth
                     .requestMatchers("/public/**", "/debug").permitAll()
-                    .requestMatchers("/webjars/swagger-ui/**", "/v3/api-docs/**").permitAll();
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
 
             // Dynamically register secured endpoints
             SECURED_ENDPOINTS.forEach((method, endpoints) -> {
