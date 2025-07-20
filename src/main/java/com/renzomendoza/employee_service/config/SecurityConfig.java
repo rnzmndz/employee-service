@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Configuration
-@Profile("!dev")
+@Profile({"!dev", "!docker"})
 @EnableWebSecurity
 public class SecurityConfig {
 
