@@ -31,7 +31,7 @@ public class SwaggerConfig {
 
             Server cloud = new Server()
                 .url(cloudUrl)
-                .description("Localhost");
+                .description("Cloud");
 
         Server localhost = new Server()
                 .url("http://localhost:8080")
