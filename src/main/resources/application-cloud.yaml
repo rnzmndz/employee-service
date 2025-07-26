@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: employee-service
+  config:
+    import: optional:configserver:https://microservice-project-347v.onrender.com/
+  main:
+    allow-bean-definition-overriding: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
