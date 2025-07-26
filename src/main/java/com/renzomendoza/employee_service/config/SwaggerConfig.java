@@ -22,9 +22,16 @@ import java.util.List;
 )
 public class SwaggerConfig {
 
+        @Value("${services.api-gateway.url}")
+        private String cloudUrl;
+
     @Bean
     public OpenAPI employeeServiceOpenAPI() {
         String ip = NetworkUtils.getLocalIpAddress();
+
+            Server cloud = new Server()
+                .url(cloudUrl)
+                .description("Localhost");
 
         Server localhost = new Server()
                 .url("http://localhost:8080")
@@ -52,6 +59,6 @@ public class SwaggerConfig {
                                         .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
-                .servers(List.of(localhost, ipBased, docker));
+                .servers(List.of(localhost, ipBased, docker, cloud));
     }
 }
