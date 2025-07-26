@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,14 +23,14 @@ import java.util.List;
 )
 public class SwaggerConfig {
 
-        @Value("${services.api-gateway.url}")
-        private String cloudUrl;
+    @Value("${services.api-gateway.url}")
+    private String cloudUrl;
 
     @Bean
     public OpenAPI employeeServiceOpenAPI() {
         String ip = NetworkUtils.getLocalIpAddress();
 
-            Server cloud = new Server()
+        Server cloud = new Server()
                 .url(cloudUrl)
                 .description("Cloud");
 
